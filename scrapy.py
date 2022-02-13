@@ -1,62 +1,71 @@
 from cgitb import html
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
 import pandas as pd
+import csv
 
 options = webdriver.ChromeOptions()
-options.add_argument('--start-maximized')
 options.add_argument('--disable-extensions')
+#options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 
 driver.get('https://www.padron.gob.ar/publica/')
-
-time.sleep(3)
+time.sleep(1)
 
 select = Select(driver.find_element_by_id('site'))
-select.select_by_visible_text('BUENOS AIRES')
+select.select_by_visible_text('CORDOBA')
 
-time.sleep(3)
+time.sleep(1)
 
 select = Select(driver.find_element_by_id('elec'))
 select.select_by_value(str(3))
 
-time.sleep(3)
+time.sleep(1)
 
-select = Select(driver.find_element_by_id('secm'))
-select.select_by_value("00003")
+try:
+    select = Select(driver.find_element_by_id('secm'))
+    select.select_by_value("00003")
+except:
+    print("ERROR en sección")
 
-time.sleep(3)
+
+
+time.sleep(1)
 
 input = driver.find_element_by_id('mesa')
 input.send_keys('1')
 
-time.sleep(3)
+time.sleep(1)
 
 btn = driver.find_element_by_id('btnVer')
 btn.click()
 
-time.sleep(3)
+time.sleep(1)
 # Ahora con los resultados que se tienen hacer scraping
 
-#tabla = driver.find_elements_by_tag_name('table')
+soup = BeautifulSoup(driver.page_source,'html.parser')
 
-tabla = driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/table')
+table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
 
-#"tbl table table-striped table-bordered table-hover"
-# obtener todas las filas de la tabla
+rows = table[0].find_all("tr")
 
-#print(tabla)
+csvFile = open("./mesa.csv", 'wt', newline='', encoding='utf-8')
+writer = csv.writer(csvFile)
 
-#/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/table/thead/tr
-
-
-#for row in rows:
-#    col = row.find_elements_by_tag_name('td')[1] 
-#    print(col.text) 
-
+try:
+    for row in rows:
+        csvRow = []
+        for cell in row.find_all(['td','th']):
+            el = cell.get_text().strip("\"").lstrip().rstrip()
+            csvRow.append(el)
+        writer.writerow(csvRow)
+  
+finally:
+    csvFile.close()

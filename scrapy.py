@@ -9,10 +9,21 @@ from bs4 import BeautifulSoup
 import time
 import pandas as pd
 import csv
+import sys
+
+
+#procesamiento de parámetros
+
+print("Número de parámetros: ", len(sys.argv))
+#print("Lista de argumentos: ", sys.argv)
+print(type(sys.argv[1]))
+print(type(sys.argv[2]))
+print(type(sys.argv[3]))
+
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-extensions')
-#options.headless = True
+options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 

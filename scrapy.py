@@ -14,16 +14,16 @@ import sys
 
 #procesamiento de parámetros
 
-print("Número de parámetros: ", len(sys.argv))
+#print("Número de parámetros: ", len(sys.argv))
 #print("Lista de argumentos: ", sys.argv)
-print(type(sys.argv[1]))
-print(type(sys.argv[2]))
-print(type(sys.argv[3]))
+#print(type(sys.argv[1]))
+#print(type(sys.argv[2]))
+#print(type(sys.argv[3]))
 
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-extensions')
-options.headless = True
+#options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 
@@ -31,20 +31,21 @@ driver.get('https://www.padron.gob.ar/publica/')
 time.sleep(1)
 
 select = Select(driver.find_element_by_id('site'))
-select.select_by_visible_text('CORDOBA')
+select.select_by_visible_text('BUENOS AIRES')
 
 time.sleep(1)
-
+# elecciones = True
+# while elecciones
 select = Select(driver.find_element_by_id('elec'))
-select.select_by_value(str(3))
+select.select_by_value('1')
 
 time.sleep(1)
 
 try:
     select = Select(driver.find_element_by_id('secm'))
-    select.select_by_value("00003")
+    select.select_by_value("00001")
 except:
-    print("ERROR en sección")
+    print("No se requiere sección")
 
 
 
@@ -59,11 +60,16 @@ btn = driver.find_element_by_id('btnVer')
 btn.click()
 
 time.sleep(1)
-# Ahora con los resultados que se tienen hacer scraping
+
+# Hasta acá va el while de mesas
+
+# Ahora con los resultados armar el archivo
 
 soup = BeautifulSoup(driver.page_source,'html.parser')
-
-table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
+try:
+    table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
+except:
+    print("No hay resultados")
 
 rows = table[0].find_all("tr")
 

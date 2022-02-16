@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import time
 import pandas as pd
 import csv
+
 # Armo la lista de secciones
 secciones = []
 for i in range(137):
@@ -20,28 +21,37 @@ secciones.append("00999")
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-extensions')
-options.headless = True
+#options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 
-driver.get('https://www.padron.gob.ar/publica/') # <-- poner en el catch
+driver.get('https://www.padron.gob.ar/publica/')
 time.sleep(1)
 
 select = Select(driver.find_element_by_id('site'))
 select.select_by_visible_text('BUENOS AIRES')
 
+csvFile = open("./resultados.csv", 'wt', newline='', encoding='utf-8')
+writer = csv.writer(csvFile)
+
 time.sleep(1)
 for i in secciones:
+
+    
+
     select = Select(driver.find_element_by_id('secm'))
     select.select_by_value(i)
-    print("------------->", select)
-    
+
     time.sleep(1)
 
     hayMesa = True
     numMesa = 1
 
+    #Guardar en variable, la sección
+
     while hayMesa:
+        #guardar número de mesa
+
         input = driver.find_element_by_id('mesa')
         input.clear()
         input.send_keys(str(numMesa))
@@ -51,11 +61,30 @@ for i in secciones:
         btn.click()
 
         time.sleep(1)
+
         try:
+
+            soup = BeautifulSoup(driver.page_source,'html.parser')
+            table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
+            rows = table[0].find_all("tr")
+            rowPri = [i,numMesa]
+            writer.writerow(rowPri)    
+        
+            for row in rows:
+                csvRow = []
+                for cell in row.find_all(['td','th']):
+                    el = cell.get_text().strip("\"").lstrip().rstrip()
+                    csvRow.append(el)
+                    print(el)
+                writer.writerow(csvRow)
+                print(csvRow)
+
+        
+            print("llega")
             btn = driver.find_element_by_id('btnVolver')
             btn.click()
             numMesa = numMesa + 1
-            time.sleep(1)
+            time.sleep(1)      
         except:
             #Si falla es porque se terminaron las mesas
             hayMesa = False
@@ -65,30 +94,4 @@ for i in secciones:
             select.select_by_visible_text('BUENOS AIRES')
             time.sleep(1)
 
-
-
-# Hasta acá va el while de mesas
-
-# Ahora con los resultados armar el archivo
-
-soup = BeautifulSoup(driver.page_source,'html.parser')
-try:
-    table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
-except:
-    print("No hay resultados")
-
-rows = table[0].find_all("tr")
-
-csvFile = open("./mesa.csv", 'wt', newline='', encoding='utf-8')
-writer = csv.writer(csvFile)
-
-try:
-    for row in rows:
-        csvRow = []
-        for cell in row.find_all(['td','th']):
-            el = cell.get_text().strip("\"").lstrip().rstrip()
-            csvRow.append(el)
-        writer.writerow(csvRow)
-  
-finally:
-    csvFile.close()
+csvFile.close()

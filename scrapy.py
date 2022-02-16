@@ -1,4 +1,7 @@
 from cgitb import html
+from multiprocessing.sharedctypes import Value
+from selectors import SelectorKey
+from attr import validate
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import TimeoutException
@@ -67,7 +70,11 @@ for i in secciones:
             soup = BeautifulSoup(driver.page_source,'html.parser')
             table = soup.find_all("table", {"class": "tbl table table-striped table-bordered table-hover"})
             rows = table[0].find_all("tr")
-            rowPri = [i,numMesa]
+            secm = soup.find("select",id='secm').find("option", value = i).get_text()
+
+            secm = secm.lstrip().rstrip()
+            
+            rowPri = [secm,numMesa]
             writer.writerow(rowPri)    
         
             for row in rows:
@@ -75,12 +82,8 @@ for i in secciones:
                 for cell in row.find_all(['td','th']):
                     el = cell.get_text().strip("\"").lstrip().rstrip()
                     csvRow.append(el)
-                    print(el)
                 writer.writerow(csvRow)
-                print(csvRow)
 
-        
-            print("llega")
             btn = driver.find_element_by_id('btnVolver')
             btn.click()
             numMesa = numMesa + 1

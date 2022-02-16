@@ -24,7 +24,7 @@ secciones.append("00999")
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-extensions')
-#options.headless = True
+options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 

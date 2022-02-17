@@ -16,15 +16,16 @@ import csv
 # Armo la lista de secciones
 secciones = []
 for i in range(137):
-    val = ("0000"+str(i+1))[-5:]
-    secciones.append(val)
+    if  i != 61 and i > 5:
+        val = ("0000"+str(i+1))[-5:]
+        secciones.append(val)
 secciones.append("00998")
 secciones.append("00999")
 
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-extensions')
-options.headless = True
+#options.headless = True
 
 driver = webdriver.Chrome(chrome_options=options)
 
@@ -34,7 +35,7 @@ time.sleep(1)
 select = Select(driver.find_element_by_id('site'))
 select.select_by_visible_text('BUENOS AIRES')
 
-csvFile = open("./resultados.csv", 'wt', newline='', encoding='utf-8')
+csvFile = open("./res2.csv", 'wt', newline='', encoding='utf-8')
 writer = csv.writer(csvFile)
 
 time.sleep(1)
@@ -92,7 +93,7 @@ for i in secciones:
             #Si falla es porque se terminaron las mesas
             hayMesa = False
             driver.get('https://www.padron.gob.ar/publica/') 
-            time.sleep(1)
+            time.sleep(2)
             select = Select(driver.find_element_by_id('site'))
             select.select_by_visible_text('BUENOS AIRES')
             time.sleep(1)

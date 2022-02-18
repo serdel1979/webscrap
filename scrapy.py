@@ -15,10 +15,9 @@ import csv
 
 # Armo la lista de secciones
 secciones = []
-for i in range(137):
-    if  i != 61 and i > 5:
-        val = ("0000"+str(i+1))[-5:]
-        secciones.append(val)
+for i in range(63):
+    val = ("0000"+str(i+1))[-5:]
+    secciones.append(val)
 secciones.append("00998")
 secciones.append("00999")
 
@@ -35,7 +34,7 @@ time.sleep(1)
 select = Select(driver.find_element_by_id('site'))
 select.select_by_visible_text('BUENOS AIRES')
 
-csvFile = open("./res2.csv", 'wt', newline='', encoding='utf-8')
+csvFile = open("./alanus.csv", 'wt', newline='', encoding='utf-8')
 writer = csv.writer(csvFile)
 
 time.sleep(1)
